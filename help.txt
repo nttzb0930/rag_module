@@ -1,0 +1,18 @@
+"""2.1.4.1 tạm
+2.2.1.1 chỉ có * miền nam miền bắc hoàn cảnh đang gộp chung
+2.2.1.2 chỉ có * miền nam miền bắc gộp
+2.2.2.2 tạm
+3.1.1.2 tạm + dài 
+3.1.2.1 tạm
+3.1.2.2 chưa tách bullet
+3.2.1.1 dài vcl
+3.2.1.2 dài vcl format ngu 
+3.2.2.1
+3.2.2.2 xem thêm trường hợp ngoại lệ của bullet con
+3.2.2.3 như 3.2.2.2
+3.2.2.4 quá nhièu
+3.2.2.5 lol format
+"""
+
+
+
