@@ -1,4 +1,3 @@
-
 import re
 def clean_text(text):
     """
@@ -48,24 +47,5 @@ def clean_text(text):
     # 4) Fix xuống dòng giữa ngoặc kép
     text = re.sub(r"“\s+", "“", text)
     text = re.sub(r"\s+”", "”", text)
-
-    # 5) Chuẩn hoá heading đánh số (PDF hay dính vào cuối câu hoặc mất dấu chấm)
-    # 5.1) Nếu heading bị dính ở giữa dòng: "... tư bản 1.1.4. Tư bản ..." -> xuống dòng trước "1.1.4."
-    text = re.sub(
-        r"(?<!\n)(?<=\S)\s+(?=\d+(?:\.\d+)+\.?\s)",
-        "\n",
-        text,
-    )
-
-    # 5.2) Bỏ số trang đứng trước heading: "1 1.4.1 Dịch vụ" -> "1.4.1 Dịch vụ"
-    text = re.sub(r"^\s*\d{1,3}\s+(?=\d+\.\d)", "", text, flags=re.MULTILINE)
-
-    # 5.3) Bổ sung dấu chấm sau mã số nếu thiếu: "1.4.1 Dịch vụ" -> "1.4.1. Dịch vụ"
-    text = re.sub(
-        r"^\s*(\d+(?:\.\d+)+)\s+(?=\S)",
-        r"\1. ",
-        text,
-        flags=re.MULTILINE,
-    )
 
     return text

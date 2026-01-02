@@ -42,7 +42,7 @@ def sections_to_documents_with_bullets(sections, doc_type: str, chapter_number: 
         }
 
         # Tách Theo Star Bullet
-        bullets = extract_star_bullets(content, parent_path)
+        bullets = extract_star_bullets(content, parent_path, section_path=number)
         # Return Bullets Format List[Dict]
         # Nếu Không Có Star Bullet → Giữ Nguyên Section Đó
         if not bullets:

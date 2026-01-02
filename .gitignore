@@ -1,4 +1,9 @@
 .venv/
 __pycache__/
 *.pkl
-*.log.env 
+*.pyc
+*.log
+.env
+*.env.*
+
+ddđ

@@ -46,12 +46,14 @@ class BasePdfIngestor:
 
 
         for idx, chapter_text in enumerate(detail_contents, start=1):
+            # clean detail_content
             chapter_text = t.clean_text(chapter_text)
             chapter_text = t.fix_heading_broken_lines(chapter_text)
-
+            # parse with fomart number section
             sections = p.extract_numbered_section(chapter_text)
             sections = p.build_metadata(sections, source=self.path)
-
+            
+            # sau khi build metadata xong mới tách bullet tránh mất path
             docs_sections = d.sections_to_documents_with_bullets(
                 sections,
                 doc_type="content",
@@ -59,7 +61,8 @@ class BasePdfIngestor:
                 chapter_title=chapter_titles[idx-1]
             )
             combined_docs.extend(docs_sections)
-            # nếu có mục tiêu chương thì thêm 
+
+            # nếu chapter có mục tiêu chương thì thêm 
             if idx - 1 < len(summaries):
                 combined_docs.extend(
                     p.objectives_to_documents(
@@ -69,5 +72,6 @@ class BasePdfIngestor:
                         source=self.path
                     )
                 )
+                
         return combined_docs, chapter_titles
 

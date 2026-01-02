@@ -4,8 +4,9 @@ from .settings import (
     EMBED_MODEL_NAME,
     CHAPTER_PATTERN_LSD,
     CHAPTER_PATTERN_KTCT,
-    CHAPTER_PATTERN_TRIET
-    )
+    CHAPTER_PATTERN_TRIET,
+    NO_SPLIT_SECTION_PATH_LSD,
+)
 from .paths import (
     PDF_PATH_LSD, 
     PDF_PATH_KTCT,
@@ -62,4 +63,5 @@ __all__ = [
     "CHAPTER_PATTERN_LSD",
     "CHAPTER_PATTERN_KTCT",
     "CHAPTER_PATTERN_TRIET",
+    "NO_SPLIT_SECTION_PATH_LSD",
 ]

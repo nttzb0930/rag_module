@@ -1,5 +1,4 @@
 import re
-
 # Tách Theo Section
 def extract_numbered_section(text):
     pattern = re.compile(r'^(\d+(?:\.\d+)+)\.\s+(.+?)\n(.*?)(?=^\d+(?:\.\d+)+\.\s|\Z)',re.DOTALL | re.MULTILINE)
@@ -14,13 +13,13 @@ def extract_numbered_section(text):
             parts = title.split(" * ", 1)
             title = parts[0].strip()
             content = "* " + parts[1].strip() + "\n" + content
-
         sections.append({
             "number": num,
+            # "title": title,
             "title": title,
+            # "content": content,
             "content": content,
             "level": num.count(".")
-        })
+    })
 
     return sections
-\\
