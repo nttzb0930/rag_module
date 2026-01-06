@@ -1,10 +1,8 @@
-from .pipeline import route_and_split
-from .parser import parse_route_and_split
-from .doc_router import route_doc
+from .parser_res_json import parse_json, parse_intent_response, parse_route_and_split
 
 
-__all__ = [
-   "route_and_split",
-   "parse_route_and_split",
-   "route_doc",
+
+_all__ = [
+   'parse_intent_response',
+   'parse_route_and_split',
 ]

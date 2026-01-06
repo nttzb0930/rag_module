@@ -1,6 +1,7 @@
-from .routing import ROUTER_AND_SPLIT_PROMPT
+from .routing import ROUTER_AND_SPLIT_PROMPT, INTENT_PROMPT
 
 
 __all__ = [
-    'ROUTER_AND_SPLIT_PROMPT'
+    'ROUTER_AND_SPLIT_PROMPT',
+    'INTENT_PROMPT',
 ]

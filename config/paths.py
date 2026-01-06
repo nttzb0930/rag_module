@@ -26,4 +26,5 @@ VECTORSTORE_DIR_TRIET = os.path.join(CACHE_DIR, "db_triet")
 COMBINED_DOCS_PATH_TRIET = os.path.join(CACHE_DIR, "combined_docs_triet.pkl")
 BM25_CACHE_PATH_TRIET = os.path.join(CACHE_DIR, "bm25_triet_by_chapter.pkl")
 
-
+# Sample cache path
+SAMPLES_CACHE_PATH = os.path.join(CACHE_DIR, 'samples_semantic.pkl')

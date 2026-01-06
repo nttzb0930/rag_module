@@ -20,6 +20,7 @@ from .paths import (
     BM25_CACHE_PATH_LSD,
     BM25_CACHE_PATH_KTCT,
     BM25_CACHE_PATH_TRIET,
+    SAMPLES_CACHE_PATH,
 )
 
 class SentenceTransformerWrapper:
@@ -64,4 +65,5 @@ __all__ = [
     "CHAPTER_PATTERN_KTCT",
     "CHAPTER_PATTERN_TRIET",
     "NO_SPLIT_SECTION_PATH_LSD",
+    "SAMPLES_CACHE_PATH",
 ]

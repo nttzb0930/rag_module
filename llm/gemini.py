@@ -20,10 +20,16 @@ class GeminiLLM(BaseLLM):
         self.client = genai.Client(api_key=api_key)
 
     def generate(self, prompt: str) -> str:
+        """
+        prompt template, question or anything
+        """
         response = self.client.models.generate_content(model=self.model,contents=prompt)
         return response.text
     def stream(self, prompt: str):
-        """Yield text từng chunk dùng với StreamingResponse"""
+        """
+        prompt template, question or anything
+        Yield text từng chunk dùng với StreamingResponse
+        """
         response = self.client.models.generate_content_stream(model=self.model,contents=prompt)
         for chunk in response:
             if not chunk.candidates:

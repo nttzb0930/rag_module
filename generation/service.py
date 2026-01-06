@@ -6,11 +6,14 @@ class GenerationService:
         self.llm = llm
 
     @staticmethod
+    # sau khi search ra top docs đưa vào làm context
     def _build_context(docs):
         return "\n\n".join(d.page_content for d in docs)
     
 
-    def answer(self, question, docs):
+    def answer(self, question, docs=None):
+        if docs is None:
+            return self.llm.generate(question)
         prompt = ANSWER_PROMPT.format(
             context=self._build_context(docs),
             question=question,
@@ -33,6 +36,11 @@ class GenerationService:
         )
         for chunk in self.llm.stream(prompt):
             yield chunk
+    def ask_clarify(self, question, prompt_template=None):  
+        if prompt_template is None:
+            return self.llm.generate(question)
+        prompt = prompt_template.replace("{{user_input}}", question)
+        return self.llm.generate(prompt)
 
 
 
