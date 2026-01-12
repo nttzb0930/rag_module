@@ -57,7 +57,6 @@ async def lifespan(app: FastAPI):
     global ktct_combined_docs, ktct_chapter_titles, ktct_vectorstore
     global triet_combined_docs, triet_chapter_titles, triet_vectorstore
 
-    semantic_redis = BaseSemanticRouter
     llm = get_generation_service()
     # 1) Load/build corpus (từ cache .pkl)
     lsd_combined_docs, lsd_chapter_titles = load_or_build_lsd()
