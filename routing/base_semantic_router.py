@@ -4,7 +4,7 @@ import numpy as np
 
 
 class BaseSemanticRouter:
-    def __init__(self, routes, embedding=EMBED_MODEL, reducer="max", threshold=0.35, margin=0.05):
+    def __init__(self, routes, embedding=EMBED_MODEL, reducer="max", threshold=0.4, margin=0.1):
         self.routes = routes # dict {name: [samples]}
         self.embedding = embedding
         self.reducer = reducer

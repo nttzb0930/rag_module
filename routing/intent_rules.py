@@ -31,8 +31,8 @@ class IntentRule:
         if scores.get("summary", 0) > 0:
             return {"intent": "summary", "confidence": min(1.0, 0.6 + 0.2 * scores["summary"])}
 
-        if scores.get("chat", 0) > 0 and len(q.split()) <= 6:
-            return {"intent": "chat", "confidence": 0.85}
+        if scores.get("chitchat", 0) > 0 and len(q.split()) <= 6:
+            return {"intent": "chitchat", "confidence": 0.85}
 
         if scores.get("study", 0) > 0 and ("?" in q or len(q.split()) >= 4):
             return {"intent": "study", "confidence": min(1.0, 0.55 + 0.15 * scores["study"])}

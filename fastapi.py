@@ -1,10 +1,12 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
-from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
-
-from rag_module.semantic_router import semantic_router
-from rag_module.generation import get_generation_service
+from rag_module.routing import (
+    route_and_split, 
+    parse_corpus_response,
+    route_doc,
+    intent_route,
+)
 from rag_module.vectorstore import (
     load_or_build_lsd_vectorstore,
     load_or_build_ktct_vectorstore,
@@ -20,7 +22,6 @@ from rag_module.ingestion import (
 from rag_module.pipeline import (
     rag_pipeline,
     summary_pipeline,
-    rag_pipeline_stream,
 )
 from rag_module.config import (
     EMBED_MODEL,
@@ -28,14 +29,14 @@ from rag_module.config import (
     BM25_CACHE_PATH_KTCT,
     BM25_CACHE_PATH_TRIET,
 )
-from rag_module.routing.doc_router import route_doc
+from rag_module.generation import get_generation_service
+from rag_module.prompts import ROUTE_CORPUS_PROMPT
 
-
-# cache câu hỏi câu trả lời nhưng user có thể thay đổi vài từ lên không cache đúng
-# semantic embed question và question mới tính cosine similarity > 0.9 thì lấy ra còn không thì render từ vector ra
 
 
 # Global state
+semantic_redis = None
+llm = None
 lsd_combined_docs = None
 lsd_chapter_titles = None
 lsd_vectorstore = None
@@ -50,10 +51,14 @@ triet_vectorstore = None
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    global semantic_redis
+    global llm 
     global lsd_combined_docs, lsd_chapter_titles, lsd_vectorstore
     global ktct_combined_docs, ktct_chapter_titles, ktct_vectorstore
     global triet_combined_docs, triet_chapter_titles, triet_vectorstore
 
+    semantic_redis = BaseSemanticRouter
+    llm = get_generation_service()
     # 1) Load/build corpus (từ cache .pkl)
     lsd_combined_docs, lsd_chapter_titles = load_or_build_lsd()
     ktct_combined_docs, ktct_chapter_titles = load_or_build_ktct()
@@ -74,7 +79,13 @@ class QueryResponse(BaseModel):
 
 def select_corpus(question: str):
     corpus = route_doc(question)
-    print(f"[DEBUG] Doc Router -> {corpus}")
+    if corpus is None:
+        prompt = ROUTE_CORPUS_PROMPT.format(question=question)
+        try:
+            raw= llm.generate(prompt)
+            corpus = parse_corpus_response(raw)
+        except Exception:
+            return (None, None, None, None)
     if corpus == "ktct":
         return (
             ktct_chapter_titles,
@@ -102,25 +113,36 @@ app = FastAPI(lifespan=lifespan)
 @app.post("/rag", response_model=QueryResponse)
 def rag_endpoint(payload: QueryRequest):
     question = payload.question
-
+    # Load Cache Question From Redis
+    # cache câu hỏi câu trả lời nhưng user có thể thay đổi vài từ lên không cache đúng
+    # semantic embed question và question mới tính cosine similarity > 0.9 thì lấy ra còn không thì render từ vector ra
     cached = get_answer_from_redis(question)
     if cached:
         return QueryResponse(answer=cached)
-
-    # chọn corpus theo nội dung câu hỏi
+    # IntentRouter
+    print("-"*100)
+    raw_intent = intent_route(question, llm)
+    print(raw_intent)
+    """
+    {'handled': False, 'intent': 'unknown', 'confidence': 0.0}  -> Gọi LLM Xử Lý
+    {'ask': 'Chủ trương của Đảng nhằm bảo vệ và giữ vững chính quyền cách mạng (9/1945–12/1946) là gì?', 'handled': True, 'intent': 'study', 'need_more_information': False, 'needs_normalization': False, 'normalized_query': 'Chủ trương của Đảng nhằm bảo vệ và giữ vững chính quyền cách mạng (9/1945–12/1946) là 
+    gì?', 'sub_questions': []}
+    """
+    intent = raw_intent['intent']
+    if not raw_intent['handled']:
+        return QueryResponse(answer=raw_intent.get("message", "Vui lòng cung cấp thêm thông tin."))
+    if intent in ("chitchat", "general_qa"):
+        return QueryResponse(answer=raw_intent.get("answer", ""))
     chapter_titles, combined_docs, vectorstore, bm25_cache_path = select_corpus(question)
-    if chapter_titles is None:
-        gen = get_generation_service()
-        answer = gen.llm.generate(question)
-        return QueryResponse(answer=answer)
-    scores = semantic_router.guide(question)
-    best_score, best_route = scores[0]
-    THRESHOLD = 0.35
+    if not chapter_titles:
+        raise ValueError("Chapter Titles Not Null!")
+    chapter_number, sub_questions = route_and_split(question, chapter_titles, llm)
 
-    if best_route == "summary" and best_score >= THRESHOLD:
+    if intent == 'summary':
         answer = summary_pipeline(
             question=question,
-            chapter_titles=chapter_titles,
+            sub_questions=sub_questions,
+            chapter_number=chapter_number,
             vectorstore=vectorstore,
             combined_docs=combined_docs,
             embed_model=EMBED_MODEL,
@@ -130,7 +152,8 @@ def rag_endpoint(payload: QueryRequest):
     else:
         answer = rag_pipeline(
             question=question,
-            chapter_titles=chapter_titles,
+            sub_questions=sub_questions,
+            chapter_number=chapter_number,
             vectorstore=vectorstore,
             combined_docs=combined_docs,
             embed_model=EMBED_MODEL,
@@ -141,38 +164,5 @@ def rag_endpoint(payload: QueryRequest):
     return QueryResponse(answer=answer)
 
 
-@app.post("/rag-stream")
-def rag_stream(payload: QueryRequest):
-    question = payload.question
-
-    chapter_titles, combined_docs, vectorstore, bm25_cache_path = select_corpus(question)
-
-    scores = semantic_router.guide(question)
-    best_score, best_route = scores[0]
-    THRESHOLD = 0.35
-
-    def token_stream():
-        if best_route == "summary" and best_score >= THRESHOLD:
-            answer = summary_pipeline(
-                question=question,
-                chapter_titles=chapter_titles,
-                vectorstore=vectorstore,
-                combined_docs=combined_docs,
-                embed_model=EMBED_MODEL,
-                bm25_cache_path=bm25_cache_path,
-            )
-            yield answer
-        else:
-            for chunk in rag_pipeline_stream(
-                question=question,
-                chapter_titles=chapter_titles,
-                vectorstore=vectorstore,
-                combined_docs=combined_docs,
-                embed_model=EMBED_MODEL,
-                bm25_cache_path=bm25_cache_path
-            ):
-                yield chunk
-
-    return StreamingResponse(token_stream(), media_type="text/plain")
 
 

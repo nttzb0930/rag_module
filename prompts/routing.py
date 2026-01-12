@@ -1,21 +1,47 @@
-ROUTER_AND_SPLIT_PROMPT = """
+ROUTE_CORPUS_PROMPT = """
+NHIỆM VỤ CHÍNH: PHÂN LOẠI CÂU HỎI THUỘC MÔN:
+- lsd: Lịch Sử Đảng
+- ktct: Kinh Tế Chính Trị Mác Lê Nin
+- triet: Triết Học Mác Lê Nin
+LUỒNG THỰC HIỆN:
+- Dựa vào: {question} 
+- Xác định xem câu hỏi của người dùng có liên quan đến môn học không
+- Nếu có xác định {question} thuộc môn học nào trả lại
+    OUTPUT: CHỈ TRẢ VỀ ĐỊNH DẠNG CHUẨN JSON DƯỚI ĐÂY KHÔNG GIẢI THÍCH GÌ THÊM 
+    ```json
+    {{
+        "corpus": lsd|ktct|triet
+    }}
+- Nếu không xác định được {question} có liên quan đến những môn học đã đề cập trả lại
+   OUTPUT: CHỈ TRẢ VỀ ĐỊNH DẠNG CHUẨN JSON DƯỚI ĐÂY KHÔNG GIẢI THÍCH GÌ THÊM
+   ```json
+   {{
+      "corpus": "unknown"
+   }}
+"""
+ROUTE_CHAPTER_NUMBER_and_SPLIT_QUES_PROMPT = """
 NHIỆM VỤ CỦA BẠN LÀ:
-==========================
-NHIỆM VỤ 1: XÁC ĐỊNH CHƯƠNG
-==========================
-Dựa vào danh sách chương sau:
-{chapters}
-
-- Hãy xác định câu hỏi thuộc chương nào.
-- Chỉ trả lời số chương  
-- KHÔNG được giải thích.
-
-==========================
-NHIỆM VỤ 2: TÁCH CÂU HỎI
-==========================
+//
+NHIỆM VỤ 1: XÁC ĐỊNH LẠI CÂU HỎI NGƯỜI DÙNG
 Dựa vào câu hỏi sau:
 {question}
-
+- Xác định xem câu hỏi có chính xác đã liên quan đến môn học
+   +) lsd: Lịch Sử Đảng
+   +) ktct: Kinh Tế Chính Trị Mác Lê Nin
+   +) triet: Triết Học Mác Lê Nin
+- Với những câu hỏi thông thường có thể trả lời ngay
+- Nếu đã xác định được câu hỏi thuộc môn học nào thì tiếp tục làm các nhiệm vụ phía dưới
+//
+NHIỆM VỤ 2: XÁC ĐỊNH CHƯƠNG
+Dựa vào danh sách chương sau:
+{chapters}
+- Hãy xác định câu hỏi thuộc chương nào
+- Chỉ trả lời số chương
+- KHÔNG giải thích gì thêm.
+//
+NHIỆM VỤ 3: TÁCH CÂU HỎI
+Dựa vào câu hỏi sau:
+{question}
 - Tách câu hỏi thành 1–4 câu hỏi con, mỗi câu chỉ chứa **1 yêu cầu duy nhất**.  
 - Nếu câu chỉ có 1 nội dung → giữ nguyên, không tách.
 - Nếu câu có nhiều nội dung:
@@ -25,8 +51,7 @@ Dựa vào câu hỏi sau:
 4. Câu hỏi phải đúng dạng câu hỏi
 5. Nếu là “ý nghĩa” thì phải viết dạng: Ý nghĩa của ... là gì?
 6. Luôn kết thúc bằng ? (không trả “cụm danh từ” trơ trọi).
-
-
+//
 OUTPUT: 
 - Trả lời JSON với dạng:
 {{
@@ -37,7 +62,7 @@ OUTPUT:
 """
 
 
-INTENT_PROMPT = """
+ROUTE_INTENT_PROMPT = """
 Bạn là bộ phân loại truy vấn đầu vào cho hệ thống hỏi đáp.
 
 NHIỆM VỤ
@@ -78,10 +103,13 @@ Phân loại input của người dùng vào MỘT trong các intent sau:
         "các ý chính",
 ---
 Nếu intent là "study" hoặc "summary":
-- Kiểm tra input có đủ đối tượng + mốc thời gian/phạm vi hay không
+- Kiểm tra câu hỏi có đủ thông tin để trả lời chưa
+- Nếu đủ -> đặt "need_more_information": false
 - Nếu thiếu → đặt "need_more_information": true
 - KHÔNG tự suy đoán hoặc điền thêm thông tin
-
+---
+Nếu intent là "general_qa" hoặc "chitchat":
+- Được phép trả lời ngay nhưng không quá dài dòng.
 CHUẨN HÓA CÂU HỎI
 - Chỉ chuẩn hóa nếu intent là "study_rag" hoặc "summary"
 - Chỉ chuẩn hóa nếu câu hỏi:
@@ -119,6 +147,7 @@ OUTPUT JSON:
   "need_more_information: true|false,
   "needs_normalization": true | false,
   "normalized_query": "...",
-  "sub_questions": []
+  "sub_questions": [],
+  "answer": ""
 }
 """

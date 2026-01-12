@@ -46,9 +46,8 @@ def parse_route_and_split(res: str):
     chapter = str(chapter).strip()
     if not chapter:
         raise ValueError(f"Giá trị 'chapter' trống sau normalize: {data}")
+    
     questions = [q.strip() for q in questions if q and q.strip()]
-
-
     if not questions or not isinstance(questions, list):
         raise ValueError(f"Field 'questions' không hợp lệ: {data}")
     if not questions:
@@ -65,9 +64,16 @@ def parse_intent_response(res: str):
     needs_normalization = bool(data.get("needs_normalization"))
     normalized_query = (data.get("normalized_query") or "").strip()
     sub_questions = data.get("sub_questions") or []
-
+    answer = data.get("answer") or ""
     if intent is None:
         raise ValueError(f"Thiếu field 'intent': {data}")
     if not isinstance(sub_questions, list):
         raise ValueError(f"Field 'sub_questions' không hợp lệ: {data}")
-    return user_input, intent, need_more_information, needs_normalization, normalized_query, sub_questions
+    return user_input, intent, need_more_information, needs_normalization, normalized_query, sub_questions, answer
+
+def parse_corpus_response(res: str):
+    data = parse_json(res)
+    corpus = data.get('corpus')
+    if not corpus:
+        raise ValueError("Không xác định được corpus")
+    return corpus

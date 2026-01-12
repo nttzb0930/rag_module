@@ -36,6 +36,7 @@ INTENT_ROUTES = {
         "tóm lại là gì",
         "nói ngắn gọn lại",
         "giải thích ngắn gọn",
+        'nêu ngắn gọn'
         "cho mình bản tóm tắt",
         "cho mình ý chính",
     ],
@@ -109,7 +110,6 @@ QUES_LSD = {
         "Sự phát huy của đường lối đó trong kháng chiến chống Mỹ là gì?",
         "Nội dung đường lối cách mạng dân tộc dân chủ nhân dân tại Đại hội II (2/1951) là gì?",
         "Đường lối cách mạng hai miền được thể hiện trong nội dung Đại hội III như thế nào?",
-        "Ý nghĩa của đường lối đó là gì?",
         "Kết quả của Đảng trong kháng chiến chống Pháp (1945–1954) là gì?",
         "Ý nghĩa của Đảng trong kháng chiến chống Pháp (1945–1954) là gì?",
         "Bài học kinh nghiệm của Đảng trong kháng chiến chống Pháp (1945–1954) là gì?",
@@ -117,14 +117,12 @@ QUES_LSD = {
         "Ý nghĩa của Đảng trong kháng chiến chống Mỹ (1954–1975) là gì?",
         "Bài học kinh nghiệm của Đảng trong kháng chiến chống Mỹ (1954–1975) là gì?",
         "Hoàn cảnh Việt Nam sau 2/9/1945 như thế nào?",
-        "Chủ trương của Đảng nhằm bảo vệ và giữ vững chính quyền cách mạng (9/1945–12/1946) là gì?",
         "Toàn quốc kháng chiến diễn ra như thế nào?",
         "Ý nghĩa của toàn quốc kháng chiến là gì?",
         "Nội dung đường lối kháng chiến chống Pháp (1946–1954) là gì?",
         "Sự phát huy của đường lối đó trong kháng chiến chống Mỹ là gì?",
         "Nội dung đường lối cách mạng dân tộc dân chủ nhân dân tại Đại hội II (2/1951) là gì?",
         "Đường lối cách mạng hai miền đư ợc thể hiện trong Đại hội III như thế nào?",
-        "Ý nghĩa của đường lối đó là gì?",
         "Kết quả của Đảng trong kháng chiến chống Pháp (1945–1954) là gì?",
         "Ý nghĩa của Đảng trong kháng chiến chống Pháp (1945–1954) là gì?",
         "Bài học kinh nghiệm của Đảng trong kháng chiến chống Pháp (1945–1954) là gì?",
@@ -166,6 +164,104 @@ QUES_LSD = {
         "",
     ],
 }
+DOC_ROUTES = {
+    "lsd": [
+        # 
+        "chủ trương"
+        "chính quyền cách mạng"
+        "Cương lĩnh chính trị đầu tiên"
+        "giai cấp và mâu thuẫn",
+        "sự chuyển hướng",
+        "hội nghị trung ương 6",
+        "hội nghị trung ương 7",
+        "hội nghị trung ương 8",
+        #
+        "cách mạng", "đảng cộng sản", "hồ chí minh", "kháng chiến",
+        "giành chính quyền", "đại hội", "miền bắc", "miền nam",
+        "chống mỹ", "đổi mới",
+        "Việt Nam sau 2/9/1945",
+        "hoàn cảnh lịch sử",
+        "toàn quốc kháng chiến",
+        "ý nghĩa toàn quốc kháng chiến",
+        "kháng chiến chống Pháp",
+        "đường lối kháng chiến chống Pháp",
+        "kháng chiến toàn dân",
+        "kháng chiến toàn diện",
+        "kháng chiến lâu dài",
+        "tự lực cánh sinh",
+        "tranh thủ sự ủng hộ quốc tế",
+        "kháng chiến chống Mỹ",
+        "phát huy đường lối kháng chiến",
+        "giải phóng miền Nam",
+        "thống nhất đất nước",
+        "cách mạng dân tộc dân chủ nhân dân",
+        "Đại hội II",
+        "đường lối cách mạng hai miền",
+        "Đại hội III",
+        "kết quả kháng chiến chống Pháp",
+        "ý nghĩa kháng chiến chống Pháp",
+        "bài học kinh nghiệm kháng chiến chống Pháp",
+        "kết quả kháng chiến chống Mỹ",
+        "ý nghĩa kháng chiến chống Mỹ",
+        "bài học kinh nghiệm kháng chiến chống Mỹ",
+        "xây dựng CNXH",
+        "cả nước đi lên CNXH",
+        "tìm con đường đổi mới",
+        "đổi mới đất nước",
+        "Đường lối đổi mới",
+        "Đại hội VI",
+        "Đại hội VII",
+        "Đại hội VIII",
+        "Đại hội IX",
+        "Đại hội X",
+        "Đại hội XI",
+        "Đại hội XII",
+        "nội dung Đại hội",
+        "ý nghĩa Đại hội",
+        "điểm đổi mới của Đại hội",
+        "Cương lĩnh 1991",
+        "Cương lĩnh 2011",
+        "so sánh Cương lĩnh 1991 và 2011",
+        "thành tựu đổi mới",
+        "ý nghĩa lịch sử đổi mới",
+        "kinh nghiệm lãnh đạo đổi mới",
+        "vai trò lãnh đạo của Đảng",
+        "Đảng Cộng sản Việt Nam"
+
+    ],
+    "ktct": [
+        "hàng hóa", "thị trường", "giá trị", "lao động",
+        "cung cầu", "tiền tệ", "dịch vụ", "cổ phiếu",
+        "trái phiếu", "kinh tế thị trường",
+        # (có thể thêm giá trị thặng dư, tư bản, quan hệ sản xuất… nếu muốn)
+    ],
+    "triet": [
+        "vật chất", "ý thức", "chủ nghĩa duy vật", "chủ nghĩa duy tâm",
+        "chủ nghĩa siêu hình", "phép biện chứng",
+        "chủ nghĩa duy vật biện chứng", "chủ nghĩa duy vật lịch sử",
+
+        "mối liên hệ phổ biến", "sự phát triển", "phủ định biện chứng",
+        "đấu tranh của các mặt đối lập", "nguyên nhân kết quả",
+        "tất nhiên ngẫu nhiên", "bản chất hiện tượng",
+        "khả năng hiện thực",
+
+        "lượng", "chất", "điểm nút", "bước nhảy",
+
+        "nhận thức", "thực tiễn", "chân lý", "tiêu chuẩn của chân lý",
+
+        "tồn tại xã hội", "ý thức xã hội",
+        "lực lượng sản xuất", "quan hệ sản xuất",
+        "phương thức sản xuất", "cơ sở hạ tầng",
+        "kiến trúc thượng tầng", "hình thái kinh tế xã hội",
+
+        "đấu tranh giai cấp", "nhà nước", "cách mạng xã hội",
+
+        "con người", "bản chất con người", "lao động",
+        "tha hóa", "tự do", "vai trò quần chúng nhân dân",
+        "vai trò cá nhân", "động lực phát triển xã hội"
+    ],
+}
+
 
 
 

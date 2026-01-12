@@ -1,4 +1,5 @@
 from .prompts import ANSWER_PROMPT, SUMMARIZE_PROMPT
+from rag_module.prompts import ROUTE_INTENT_PROMPT
 
 
 class GenerationService:
@@ -10,10 +11,9 @@ class GenerationService:
     def _build_context(docs):
         return "\n\n".join(d.page_content for d in docs)
     
-
-    def answer(self, question, docs=None):
-        if docs is None:
-            return self.llm.generate(question)
+    def generate(self, prompt):
+        return self.llm.generate(prompt)
+    def answer(self, question, docs):
         prompt = ANSWER_PROMPT.format(
             context=self._build_context(docs),
             question=question,
@@ -36,10 +36,8 @@ class GenerationService:
         )
         for chunk in self.llm.stream(prompt):
             yield chunk
-    def ask_clarify(self, question, prompt_template=None):  
-        if prompt_template is None:
-            return self.llm.generate(question)
-        prompt = prompt_template.replace("{{user_input}}", question)
+    def ask_clarify(self, question):
+        prompt = ROUTE_INTENT_PROMPT.replace("{{user_input}}", question)
         return self.llm.generate(prompt)
 
 

@@ -47,9 +47,9 @@ if __name__ == "__main__":
             if bpath: print(bpath)
             print(f"content({len(content)}): {preview}")
 
-    # ví dụ:
-    pretty_print_docs(combined_docs, start=0, limit=100)
-    # pretty_print_docs(combined_docs, start=100, limit=100)
+    # test
+    # pretty_print_docs(combined_docs, start=0, limit=100)
+    print(chapter_titles)
 
 
 

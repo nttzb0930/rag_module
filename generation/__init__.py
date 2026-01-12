@@ -4,6 +4,6 @@ from .service import GenerationService
 
 
 def get_generation_service(llm=None):
-    if llm is None:
-        llm = GeminiLLM()
+    
+    llm = llm or GeminiLLM()
     return GenerationService(llm)

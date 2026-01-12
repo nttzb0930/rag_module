@@ -51,13 +51,13 @@ Câu hỏi: {question}
 
 Hãy TRÍCH XUẤT NGUYÊN VĂN tất cả các câu/đoạn trong context để trả lời cho từng ý của câu hỏi (nếu có nhiều ý thì chia rõ [1], [2], ... như hướng dẫn).
 """
-
-
-
 SUMMARIZE_PROMPT = '''
 Bạn là hệ thống RAG dựa vào {context} cung cấp tóm tắt nội dung theo yêu cầu người dùng
 ========== CONTEXT ==========
 {context}
 ========== END CONTEXT ==========
-Câu hỏi: {question}
+YÊU CẦU TÓM TẮT: {question}
+OUTPUT:
+- Nhấn ý chính, không suy đoán ngoài context
+- Nếu thiếu thông tin để trả lời, hãy nói rõ
 '''
