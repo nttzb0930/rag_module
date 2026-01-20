@@ -13,7 +13,7 @@ NO_SPLIT_SECTION_PATH_LSD = {
         "3.2.2.4",
         "3.2.2.5",
 }
-
+PINECONE_INDEX = 'ragmodule1'
 
 
 

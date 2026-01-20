@@ -1,6 +1,5 @@
 
 from rag_module.retrieval import retrieve_documents
-from rag_module.generation import get_generation_service
 import time
 
 def rag_pipeline(
@@ -10,6 +9,7 @@ def rag_pipeline(
     vectorstore,
     combined_docs,
     embed_model,
+    llm,
     bm25_cache_path=None,
 ):
     """
@@ -36,8 +36,7 @@ def rag_pipeline(
 
     # (3) rag_module/generation/generate
     t1 = time.perf_counter()
-    gen = get_generation_service()
-    answer = gen.answer(
+    answer = llm.answer(
         question=question,
         docs=docs,
     )
@@ -54,6 +53,7 @@ def summary_pipeline(
     vectorstore,
     combined_docs,
     embed_model,
+    llm,
     bm25_cache_path=None,
 ):
     """
@@ -80,8 +80,7 @@ def summary_pipeline(
 
     # (3) rag_module/generation/generate
     t1 = time.perf_counter()
-    gen = get_generation_service()
-    answer = gen.summarize(
+    answer = llm.summarize(
         question=question,###
         docs=docs,
     )

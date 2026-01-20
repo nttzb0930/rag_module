@@ -6,6 +6,7 @@ from .settings import (
     CHAPTER_PATTERN_KTCT,
     CHAPTER_PATTERN_TRIET,
     NO_SPLIT_SECTION_PATH_LSD,
+    PINECONE_INDEX,
 )
 from .paths import (
     PDF_PATH_LSD, 
@@ -65,5 +66,6 @@ __all__ = [
     "CHAPTER_PATTERN_KTCT",
     "CHAPTER_PATTERN_TRIET",
     "NO_SPLIT_SECTION_PATH_LSD",
+    "PINECONE_INDEX",
     "SAMPLES_CACHE_PATH",
 ]

@@ -22,6 +22,15 @@ def parse_json(res: str):
         end = raw.rfind("}")
         if start != -1 and end != -1 and end > start:
             raw = raw[start:end+1]
+
+    # Fix double braces
+    """
+    {{
+        "chapter": 2,
+        "questions": ["Diễn biến toàn quốc kháng chiến diễn ra như thế nào?"]
+    }}
+    """
+    raw = raw.replace('{{', '{').replace('}}', '}')
     # Parse Json
     try:
         data = json.loads(raw)  
