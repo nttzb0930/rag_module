@@ -1,0 +1,53 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rag-module"
+version = "0.1.0"
+description = "FastAPI RAG service for local PDF corpora"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi",
+    "uvicorn[standard]",
+    "pydantic",
+    "python-dotenv",
+    "google-genai",
+    "sentence-transformers",
+    "langchain-core",
+    "langchain-community",
+    "langchain-chroma",
+    "rank-bm25",
+    "scikit-learn",
+    "numpy",
+    "redis",
+    "pinecone",
+    "pypdf",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+]
+
+[tool.setuptools]
+package-dir = { "rag_module" = "." }
+packages = [
+    "rag_module",
+    "rag_module.config",
+    "rag_module.debug",
+    "rag_module.documents",
+    "rag_module.generation",
+    "rag_module.ingestion",
+    "rag_module.llm",
+    "rag_module.loaders",
+    "rag_module.parsing",
+    "rag_module.prompts",
+    "rag_module.raw_text",
+    "rag_module.retrieval",
+    "rag_module.routing",
+    "rag_module.text_preprocess",
+    "rag_module.utils",
+    "rag_module.vectorstore",
+]
