@@ -63,7 +63,7 @@ function Header({
   const { toggleSidebar } = useSidebar();
 
   return (
-    <header className="sticky top-0 z-50 flex min-h-14 items-center justify-between border-b border-neutral-100 bg-white px-4 md:min-h-12 md:justify-end md:border-b-0 md:px-7 md:pt-3">
+    <header className="flex min-h-14 items-center justify-between border-b border-neutral-100 bg-white px-4 md:min-h-12 md:justify-end md:border-b-0 md:px-7 md:pt-3">
       {/* Mobile Left Side: Toggle Sidebar and Title */}
       <div className="flex items-center gap-2.5 md:hidden">
         <button
@@ -151,22 +151,20 @@ function App() {
           } as React.CSSProperties
         }
       >
-        <div className="flex h-[100dvh] w-full bg-white text-neutral-950 overflow-hidden">
+        <div className="flex h-[100dvh] w-full overflow-hidden bg-white text-neutral-950">
           <Navbar
             onSelectNewChat={resetChat}
-            onSubmitQuestion={(q) => void submitQuestion(q)}
-            isLoading={isLoading}
             apiHost={apiHost}
           />
 
-          <SidebarInset className="flex-1 flex flex-col h-full min-w-0 overflow-hidden">
-            <section className="grid h-full min-w-0 grid-rows-[auto_1fr_auto] pb-2 md:pb-0">
+          <SidebarInset className="flex h-full min-w-0 flex-1 flex-col overflow-hidden">
+            <section className="grid h-full min-w-0 grid-rows-[auto_minmax(0,1fr)_auto]">
               <Header
                 apiHost={apiHost}
                 onResetChat={resetChat}
               />
 
-              <main className="min-h-0 flex-1 overflow-y-auto px-4 md:px-6">
+              <main className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 md:px-6">
                 {!hasMessages ? (
                   <>
                     {/* Desktop Welcome Screen (Centered Layout) */}
@@ -346,6 +344,7 @@ function App() {
                 )}
               </main>
 
+              <footer className="shrink-0 pb-[max(1rem,env(safe-area-inset-bottom))] md:pb-5">
               {error && (
                 <div className="mx-auto mb-2 inline-flex w-[min(820px,calc(100%-32px))] items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 md:w-[min(820px,calc(100%-48px))]">
                   <CircleHelp size={15} />
@@ -355,7 +354,7 @@ function App() {
 
               {/* Bottom input bar: Always shown on mobile, and on desktop only when messages exist */}
               <form
-                className={`sticky bottom-0 z-50 mx-auto mb-4 grid min-h-14 w-[min(820px,calc(100%-28px))] grid-cols-[36px_minmax(0,1fr)_38px] items-center rounded-[24px] border border-neutral-300 bg-white py-2 pl-3 pr-2 shadow-[0_26px_80px_rgba(0,0,0,0.08),0_2px_8px_rgba(0,0,0,0.04)] md:mb-5 md:w-[min(820px,calc(100%-48px))] md:grid-cols-[38px_minmax(0,1fr)_auto_40px] md:rounded-full ${!hasMessages ? "md:hidden" : ""
+                className={`mx-auto grid min-h-14 w-[min(820px,calc(100%-28px))] grid-cols-[36px_minmax(0,1fr)_38px] items-center rounded-[24px] border border-neutral-300 bg-white py-2 pl-3 pr-2 shadow-[0_26px_80px_rgba(0,0,0,0.08),0_2px_8px_rgba(0,0,0,0.04)] md:w-[min(820px,calc(100%-48px))] md:grid-cols-[38px_minmax(0,1fr)_auto_40px] md:rounded-full ${!hasMessages ? "md:hidden" : ""
                   }`}
                 onSubmit={handleSubmit}
               >
@@ -392,6 +391,7 @@ function App() {
                   )}
                 </button>
               </form>
+              </footer>
             </section>
           </SidebarInset>
         </div>

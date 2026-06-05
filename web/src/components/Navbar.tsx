@@ -9,7 +9,6 @@ import {
   Search,
   Wifi,
   X,
-  MessageSquare,
 } from "lucide-react";
 import {
   Sidebar,
@@ -24,8 +23,6 @@ import {
 
 type NavbarProps = {
   onSelectNewChat: () => void;
-  onSubmitQuestion: (question: string) => void;
-  isLoading: boolean;
   apiHost: string;
 };
 
@@ -53,25 +50,8 @@ const recentChats = [
   "Tồn tại xã hội",
 ];
 
-const examples = [
-  {
-    label: "Lịch sử Đảng",
-    question: "Chủ trương của Đảng nhằm bảo vệ chính quyền cách mạng 1945-1946 là gì?",
-  },
-  {
-    label: "Kinh tế chính trị",
-    question: "Phân tích hai thuộc tính của hàng hóa trong kinh tế chính trị.",
-  },
-  {
-    label: "Triết học",
-    question: "Vật chất và ý thức có mối quan hệ như thế nào?",
-  },
-];
-
 export function Navbar({
   onSelectNewChat,
-  onSubmitQuestion,
-  isLoading,
   apiHost,
 }: NavbarProps) {
   const { state, setOpen, isMobile, setOpenMobile } = useSidebar();
@@ -169,29 +149,6 @@ export function Navbar({
         className={`flex flex-col border-t border-neutral-200 transition-all duration-300 ${isExpanded ? "p-3.5 gap-3" : "p-3.5 gap-0"
           }`}
       >
-        {/* Examples */}
-        <div
-          className={`transition-all ${isExpanded
-            ? "opacity-100 max-h-[500px] duration-300 delay-75 ease-out"
-            : "opacity-0 max-h-0 overflow-hidden pointer-events-none duration-100 ease-in"
-            }`}
-        >
-          <section className="grid gap-1">
-            {examples.map((item) => (
-              <button
-                className="grid gap-0.5 rounded-lg px-3 py-2 text-left hover:bg-neutral-200"
-                key={item.label}
-                type="button"
-                disabled={isLoading}
-                onClick={() => onSubmitQuestion(item.question)}
-              >
-                <strong className="text-sm font-medium text-neutral-950">{item.label}</strong>
-                <span className="truncate text-xs text-neutral-500">{item.question}</span>
-              </button>
-            ))}
-          </section>
-        </div>
-
         {/* Profile */}
         <div
           className={`flex items-center rounded-lg hover:bg-neutral-200 transition-all duration-300 cursor-pointer w-full justify-start ${isExpanded ? "px-2 py-2" : "px-0 py-2"
