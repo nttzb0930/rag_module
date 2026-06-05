@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from rag_module.routing import (
     route_and_split, 
@@ -36,7 +37,9 @@ from rag_module.config import (
 from rag_module.generation import get_generation_service
 from rag_module.prompts import ROUTE_CORPUS_PROMPT
 from rag_module.utils import extract_answers_from_output, build_final_answer
+from rag_module.retrieval import retrieve_documents
 import os
+import json
 
 # Global state
 semantic_cache = None
@@ -223,6 +226,154 @@ def rag_endpoint(payload: QueryRequest):
     # Build final answer từ final_map
     final_answer = build_final_answer(sub_questions or sq_need_retrieval, final_map)
     return QueryResponse(answer=final_answer)
+
+
+def sse_event(event: str, data: dict) -> str:
+    return f"event: {event}\ndata: {json.dumps(data, ensure_ascii=False)}\n\n"
+
+
+@app.post("/rag/stream")
+def rag_stream_endpoint(payload: QueryRequest):
+    question = payload.question
+
+    def event_stream():
+        try:
+            pre_corpus = route_doc(question)
+            if pre_corpus in ("lsd", "ktct", "triet"):
+                cached_answer, _ = pinecone_emb_ans.check_cache_pinecone(
+                    question,
+                    [],
+                    scope=pre_corpus,
+                )
+                if isinstance(cached_answer, str):
+                    yield sse_event("cache_hit", {"answer": cached_answer})
+                    yield sse_event("done", {"cached": True})
+                    return
+
+            yield sse_event("status", {"message": "routing"})
+            raw_intent = intent_route(question, llm)
+            intent = raw_intent["intent"]
+            if not raw_intent["handled"]:
+                yield sse_event(
+                    "done",
+                    {
+                        "answer": raw_intent.get(
+                            "message",
+                            "Vui lòng cung cấp thêm thông tin.",
+                        )
+                    },
+                )
+                return
+
+            if intent in ("chitchat", "general_qa"):
+                yield sse_event("done", {"answer": raw_intent.get("answer", "")})
+                return
+
+            query = raw_intent.get("normalized_query") or raw_intent.get("ask") or question
+            corpus, chapter_titles, combined_docs, vectorstore, bm25_cache_path = select_corpus(question)
+            if corpus == "unknown":
+                yield sse_event(
+                    "done",
+                    {
+                        "answer": "Xin lỗi, không thể xác định được chủ đề câu hỏi. Vui lòng hỏi lại với câu hỏi rõ ràng hơn."
+                    },
+                )
+                return
+            if not chapter_titles:
+                yield sse_event("error", {"message": "Chapter Titles Not Null!"})
+                return
+
+            cached_answer, _ = pinecone_emb_ans.check_cache_pinecone(
+                query,
+                [],
+                scope=corpus,
+            )
+            if isinstance(cached_answer, str):
+                yield sse_event("cache_hit", {"answer": cached_answer})
+                yield sse_event("done", {"cached": True})
+                return
+
+            yield sse_event("status", {"message": "routing_chapter"})
+            chapter_number, sub_questions = route_and_split(query, chapter_titles, llm)
+
+            cached_answers, sq_need_retrieval = pinecone_emb_ans.check_cache_pinecone(
+                query,
+                sub_questions,
+                scope=corpus,
+            )
+            if isinstance(cached_answers, str):
+                yield sse_event("cache_hit", {"answer": cached_answers})
+                yield sse_event("done", {"cached": True})
+                return
+
+            final_map = dict(cached_answers) if cached_answers else {}
+            if not sq_need_retrieval:
+                final_answer = build_final_answer(sub_questions, final_map)
+                yield sse_event("cache_hit", {"answer": final_answer})
+                yield sse_event("done", {"cached": True})
+                return
+
+            if cached_answers:
+                cached_text = build_final_answer(sub_questions, final_map)
+                yield sse_event("cached_partial", {"answer": cached_text})
+
+            if intent != "study":
+                yield sse_event("done", {"answer": build_final_answer(sub_questions, final_map)})
+                return
+
+            yield sse_event("status", {"message": "retrieving"})
+            docs = retrieve_documents(
+                question=query,
+                sub_questions=sq_need_retrieval,
+                chapter_number=chapter_number,
+                vectorstore=vectorstore,
+                combined_docs=combined_docs,
+                embed_model=EMBED_MODEL,
+                bm25_cache_path=bm25_cache_path,
+            )
+
+            yield sse_event("status", {"message": "generating"})
+            generation_question = (
+                sq_need_retrieval[0]
+                if len(sq_need_retrieval) == 1
+                else "\n".join(
+                    f"[{i}] {sq}"
+                    for i, sq in enumerate(sq_need_retrieval, start=1)
+                )
+            )
+            raw_chunks = []
+            for chunk in llm.stream(generation_question, docs):
+                raw_chunks.append(chunk)
+                yield sse_event("chunk", {"text": chunk})
+
+            raw_answer = "".join(raw_chunks)
+            parsed_answers = extract_answers_from_output(raw_answer, len(sq_need_retrieval))
+            for i, sq in enumerate(sq_need_retrieval, start=1):
+                if i in parsed_answers:
+                    sq_ans = parsed_answers[i]
+                    final_map[sq] = sq_ans
+                    pinecone_emb_ans.set(sq, sq_ans, scope=corpus)
+
+            final_answer = build_final_answer(sub_questions or sq_need_retrieval, final_map)
+            yield sse_event(
+                "done",
+                {
+                    "answer": final_answer,
+                    "cached": False,
+                },
+            )
+        except Exception as e:
+            print("[STREAM ERROR]", repr(e))
+            yield sse_event("error", {"message": str(e)})
+
+    return StreamingResponse(
+        event_stream(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "X-Accel-Buffering": "no",
+        },
+    )
 
 
 
