@@ -4,6 +4,7 @@ import uuid
 import numpy as np
 from typing import Optional
 from pinecone.grpc import PineconeGRPC as Pinecone
+from rag_module.utils.answer import clean_answer_text
 
 class PineconeEmbCache:
     """
@@ -99,7 +100,7 @@ class PineconeEmbCache:
         if best_score < self.threshold:
             return None
         # tam thoi khong co ttl xu ly delete sau 24h hoac khi ket thuc phien chat sau...
-        return self.redis_store.get_answer(best_id)
+        return clean_answer_text(self.redis_store.get_answer(best_id) or "")
         
 
     def set(self, question: str, answer: str, scope: str) -> str:
@@ -163,22 +164,13 @@ class PineconeEmbCache:
                     sq_need_retrieval.append(sq)
             # Nếu tất cả cache hit → return
             if not sq_need_retrieval:
-                # ADD FORMAT QUESTION: ANSWER IN HERE
-                """
-                    1. Câu hỏi
-                    - Câu trả lời
-                """
-                final_answer = "\n\n".join(
-                    f"{i+1}. {sq}\n- {cached_answers[sq]}"
-                    for i, sq in enumerate(sub_questions)
-                )
-                return final_answer, []
+                return cached_answers, []
             return cached_answers, sq_need_retrieval
         # Câu đơn hoặc subquestions = []
-        check_question =  [0] if sub_questions else question
+        check_question = sub_questions[0] if sub_questions else question
         result = self.get(check_question, scope)
         if result:
             return result, []    
-        sq_need_retrieval = sub_questions if sub_questions else [question]
+        sq_need_retrieval = [check_question]
         return None, sq_need_retrieval
     

@@ -1,0 +1,31 @@
+image:node:20-alpine
+
+# Cache node_modules để tối ưu hóa thời gian build các lần sau
+cache:
+  key:
+    files:
+      - web/package-lock.json
+  paths:
+    - web/node_modules/
+
+pages:
+  stage: deploy
+  variables:
+    # Tự động lấy tên repository làm base path cho ứng dụng Vite
+    VITE_BASE_PATH: "/$CI_PROJECT_NAME/"
+  script:
+    - cd web
+    - npm ci
+    - npm run build
+    # Di chuyển thư mục build ra thư mục 'public' ở gốc theo yêu cầu của GitLab Pages
+    - cd ..
+    - rm -rf public
+    - mv web/dist public
+  artifacts:
+    paths:
+      - public
+  rules:
+    # Tự động deploy khi push lên nhánh main, master hoặc feat/web
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == "master"
+    - if: $CI_COMMIT_BRANCH == "feat/web"

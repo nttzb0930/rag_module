@@ -23,6 +23,10 @@ from .paths import (
     BM25_CACHE_PATH_TRIET,
     SAMPLES_CACHE_PATH,
 )
+from .cors import (
+    CORS_ALLOWED_ORIGINS,
+    CORS_ALLOW_ORIGIN_REGEX,
+)
 
 class SentenceTransformerWrapper:
     """
@@ -68,4 +72,6 @@ __all__ = [
     "NO_SPLIT_SECTION_PATH_LSD",
     "PINECONE_INDEX",
     "SAMPLES_CACHE_PATH",
+    "CORS_ALLOWED_ORIGINS",
+    "CORS_ALLOW_ORIGIN_REGEX",
 ]
