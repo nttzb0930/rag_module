@@ -1,10 +1,9 @@
 import os
 
 DEFAULT_CORS_ALLOWED_ORIGINS = (
-    "http://localhost:5173,"
-    "http://127.0.0.1:5173,"
     "http://localhost:5174,"
-    "http://127.0.0.1:5174"
+    "http://127.0.0.1:5174,"
+    "https://790f-2402-800-6d3e-645b-59ab-518a-b2a3-f12f.ngrok-free.app"
 )
 
 CORS_ALLOWED_ORIGINS = [
