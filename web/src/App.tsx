@@ -151,7 +151,7 @@ function App() {
           } as React.CSSProperties
         }
       >
-        <div className="flex min-h-screen w-full bg-white text-neutral-950 overflow-hidden">
+        <div className="flex h-[100dvh] w-full bg-white text-neutral-950 overflow-hidden">
           <Navbar
             onSelectNewChat={resetChat}
             onSubmitQuestion={(q) => void submitQuestion(q)}
@@ -159,8 +159,8 @@ function App() {
             apiHost={apiHost}
           />
 
-          <SidebarInset className="flex-1 flex flex-col min-h-screen min-w-0 overflow-hidden">
-            <section className="grid h-screen min-w-0 grid-rows-[auto_1fr_auto] pb-2 md:pb-0">
+          <SidebarInset className="flex-1 flex flex-col h-full min-w-0 overflow-hidden">
+            <section className="grid h-full min-w-0 grid-rows-[auto_1fr_auto] pb-2 md:pb-0">
               <Header
                 apiHost={apiHost}
                 onResetChat={resetChat}
