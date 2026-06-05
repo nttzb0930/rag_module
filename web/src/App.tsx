@@ -63,7 +63,7 @@ function Header({
   const { toggleSidebar } = useSidebar();
 
   return (
-    <header className="flex min-h-14 items-center justify-between border-b border-neutral-100 bg-white px-4 md:min-h-12 md:justify-end md:border-b-0 md:px-7 md:pt-3">
+    <header className="sticky top-0 z-50 flex min-h-14 items-center justify-between border-b border-neutral-100 bg-white px-4 md:min-h-12 md:justify-end md:border-b-0 md:px-7 md:pt-3">
       {/* Mobile Left Side: Toggle Sidebar and Title */}
       <div className="flex items-center gap-2.5 md:hidden">
         <button
@@ -355,7 +355,7 @@ function App() {
 
               {/* Bottom input bar: Always shown on mobile, and on desktop only when messages exist */}
               <form
-                className={`mx-auto mb-4 grid min-h-14 w-[min(820px,calc(100%-28px))] grid-cols-[36px_minmax(0,1fr)_38px] items-center rounded-[24px] border border-neutral-300 bg-white py-2 pl-3 pr-2 shadow-[0_26px_80px_rgba(0,0,0,0.08),0_2px_8px_rgba(0,0,0,0.04)] md:mb-5 md:w-[min(820px,calc(100%-48px))] md:grid-cols-[38px_minmax(0,1fr)_auto_40px] md:rounded-full ${!hasMessages ? "md:hidden" : ""
+                className={`sticky bottom-0 z-50 mx-auto mb-4 grid min-h-14 w-[min(820px,calc(100%-28px))] grid-cols-[36px_minmax(0,1fr)_38px] items-center rounded-[24px] border border-neutral-300 bg-white py-2 pl-3 pr-2 shadow-[0_26px_80px_rgba(0,0,0,0.08),0_2px_8px_rgba(0,0,0,0.04)] md:mb-5 md:w-[min(820px,calc(100%-48px))] md:grid-cols-[38px_minmax(0,1fr)_auto_40px] md:rounded-full ${!hasMessages ? "md:hidden" : ""
                   }`}
                 onSubmit={handleSubmit}
               >
