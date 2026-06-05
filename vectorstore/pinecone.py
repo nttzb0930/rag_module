@@ -175,10 +175,10 @@ class PineconeEmbCache:
                 return final_answer, []
             return cached_answers, sq_need_retrieval
         # Câu đơn hoặc subquestions = []
-        check_question =  [0] if sub_questions else question
+        check_question = sub_questions[0] if sub_questions else question
         result = self.get(check_question, scope)
         if result:
             return result, []    
-        sq_need_retrieval = sub_questions if sub_questions else [question]
+        sq_need_retrieval = [check_question]
         return None, sq_need_retrieval
     

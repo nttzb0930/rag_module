@@ -123,6 +123,16 @@ app = FastAPI(lifespan=lifespan)
 @app.post("/rag", response_model=QueryResponse)
 def rag_endpoint(payload: QueryRequest):
     question = payload.question
+    pre_corpus = route_doc(question)
+    if pre_corpus in ("lsd", "ktct", "triet"):
+        cached_answer, _ = pinecone_emb_ans.check_cache_pinecone(
+            question,
+            [],
+            scope=pre_corpus,
+        )
+        if isinstance(cached_answer, str):
+            return QueryResponse(answer=cached_answer)
+
     # IntentRouter
     print("-"*100)
     raw_intent = intent_route(question, llm)
@@ -137,18 +147,27 @@ def rag_endpoint(payload: QueryRequest):
         return QueryResponse(answer=raw_intent.get("message", "Vui lòng cung cấp thêm thông tin."))
     if intent in ("chitchat", "general_qa"):
         return QueryResponse(answer=raw_intent.get("answer", ""))
+    query = raw_intent.get("normalized_query") or raw_intent.get("ask") or question
     corpus, chapter_titles, combined_docs, vectorstore, bm25_cache_path = select_corpus(question)
     if corpus == 'unknown':
         return QueryResponse(answer="Xin lỗi, không thể xác định được chủ đề câu hỏi. Vui lòng hỏi lại với câu hỏi rõ ràng hơn.")
     if not chapter_titles:
         raise ValueError("Chapter Titles Not Null!")
+
+    cached_answer, _ = pinecone_emb_ans.check_cache_pinecone(
+        query,
+        [],
+        scope=corpus,
+    )
+    if isinstance(cached_answer, str):
+        return QueryResponse(answer=cached_answer)
     
     # dựa vào chapter titles cung cấp cho prompt xác định chapter number and sub question
-    chapter_number, sub_questions = route_and_split(question, chapter_titles, llm)
+    chapter_number, sub_questions = route_and_split(query, chapter_titles, llm)
 
     # Cache Questions
     cached_answers, sq_need_retrieval = pinecone_emb_ans.check_cache_pinecone(
-        question, 
+        query, 
         sub_questions,
         scope=corpus
     )
@@ -165,7 +184,7 @@ def rag_endpoint(payload: QueryRequest):
     if sq_need_retrieval and intent == "study":
         print(f"[DEBUG] Starting retrieval for {len(sq_need_retrieval)} sub questions...")
         answer = rag_pipeline(
-            question=question,
+            question=query,
             sub_questions=sq_need_retrieval,
             chapter_number=chapter_number,
             vectorstore=vectorstore,
@@ -185,12 +204,12 @@ def rag_endpoint(payload: QueryRequest):
             if i in parsed_answers:
                 sq_ans = parsed_answers[i]
                 final_map[sq] = sq_ans
-                pinecone_emb_ans.set(sq, sq_ans, scope="lsd")
+                pinecone_emb_ans.set(sq, sq_ans, scope=corpus)
                 print(f"[DEBUG] Cached new answer for: {sq}")
             else:
                 print(f"[WARN] Không parse được answer cho sub question: {sq}")
     # Build final answer từ final_map
-    final_answer = build_final_answer(sub_questions, final_map)
+    final_answer = build_final_answer(sub_questions or sq_need_retrieval, final_map)
     return QueryResponse(answer=final_answer)
 
 
