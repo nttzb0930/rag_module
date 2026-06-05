@@ -1,5 +1,6 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from rag_module.routing import (
     route_and_split, 
@@ -29,6 +30,8 @@ from rag_module.config import (
     BM25_CACHE_PATH_KTCT,
     BM25_CACHE_PATH_TRIET,
     PINECONE_INDEX,
+    CORS_ALLOWED_ORIGINS,
+    CORS_ALLOW_ORIGIN_REGEX,
 )
 from rag_module.generation import get_generation_service
 from rag_module.prompts import ROUTE_CORPUS_PROMPT
@@ -120,6 +123,15 @@ def select_corpus(question: str):
     else:
         return (corpus, None, None, None, None) # handle corpus: unknown
 app = FastAPI(lifespan=lifespan)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=CORS_ALLOWED_ORIGINS,
+    allow_origin_regex=CORS_ALLOW_ORIGIN_REGEX,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 @app.post("/rag", response_model=QueryResponse)
 def rag_endpoint(payload: QueryRequest):
     question = payload.question
